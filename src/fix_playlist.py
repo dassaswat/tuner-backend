@@ -117,7 +117,7 @@ def analyse_and_fix_playlist(data):
 
     df = process_data(data)
     distance_matrix = construct_distance_matrix(df)
-    playlist = build_playlist(distance_matrix, df.shape[0], initial_percentile=25)
+    playlist = build_playlist(distance_matrix, df.shape[0], initial_percentile=10)
     playlist_ids = df.iloc[playlist].index
     playlist_uris = [f"spotify:track:{id}" for id in playlist_ids]
 
