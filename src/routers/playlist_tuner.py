@@ -1,6 +1,5 @@
 """Playlist Builder Routes."""
 
-import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, status, Depends, HTTPException

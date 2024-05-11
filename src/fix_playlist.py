@@ -321,7 +321,6 @@ def analyse_and_fix_playlist(training_data, playlist_data):
         print("Done training the model...")
 
     matrix_features = features.drop(columns=["valence"])
-    print(matrix_features.columns)
     distance_matrix = construct_distance_matrix(matrix_features, weights)
     elbow_point = find_elbow_point(features)
     emotion_cluster = get_emotion_cluster(features, elbow_point + 1)
