@@ -171,3 +171,6 @@ poetry.toml
 # LSP config files
 pyrightconfig.json
 app.db
+datasets/
+main.ipynb
+training_data.json

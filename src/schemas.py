@@ -1,8 +1,10 @@
 """Pydantic schemas."""
 
-from pydantic import BaseModel
+from typing import Optional
+from pydantic import BaseModel, ConfigDict
 
 
+# Playlist Schemas
 class PlaylistBase(BaseModel):
     """Playlist base model."""
 
@@ -16,15 +18,13 @@ class PlaylistCreate(PlaylistBase):
 class Playlist(PlaylistBase):
     """Playlist model."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     user_id: int
 
-    class Config:
-        """Pydantic configuration."""
 
-        from_attributes = True
-
-
+# User schemas
 class UserBase(BaseModel):
     """User base model."""
 
@@ -38,16 +38,67 @@ class UserCreate(UserBase):
 class User(UserBase):
     """User model."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     tplaylists: list[Playlist] = []
 
-    class Config:
-        """Pydantic configuration."""
 
-        from_attributes = True
+# Playlist Features Schemas
+class PlaylistFeatureBase(BaseModel):
+    """Playlist dataset base model."""
+
+    spotify_playlist_id: str
+    energy: float
+    liveness: float
+    tempo: float
+    speechiness: float
+    acousticness: float
+    instrumentalness: float
+    danceability: float
+    loudness: float
+    valence: float
 
 
-class SongFeatures(BaseModel):
+class PlaylistFeatureCreate(PlaylistFeatureBase):
+    """Playlist dataset create model."""
+
+
+class PlaylistFeature(PlaylistFeatureBase):
+    """Playlist dataset model."""
+
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+
+
+# Model Weights Schemas
+class ModelWeightsBase(BaseModel):
+    """Model weights base model."""
+
+    energy: float
+    liveness: float
+    tempo: float
+    speechiness: float
+    acousticness: float
+    instrumentalness: float
+    danceability: float
+    loudness: float
+    evaluation_score: float
+
+
+class ModelWeightsCreate(ModelWeightsBase):
+    """Model weights create model."""
+
+
+class ModelWeights(ModelWeightsBase):
+    """Model weights model."""
+
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+
+
+# Spotify API Schemas
+class TrackFeatures(BaseModel):
     """Song features."""
 
     acousticness: float
@@ -70,7 +121,17 @@ class SongFeatures(BaseModel):
     valence: float
 
 
-class SuggestedPlaylistResponse(BaseModel):
+# Playlist Tuner Schemas
+class TunePlaylist(BaseModel):
+    """Playlist tracks features."""
+
+    spotify_playlist_id: str
+    must_train: Optional[bool] = True
+    seed_tracks: Optional[list[int]] = None
+    tracks_features: list[Optional[TrackFeatures]]
+
+
+class TunedPlaylist(BaseModel):
     """Suggested playlist response."""
 
     uris: list[str]

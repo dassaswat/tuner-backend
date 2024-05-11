@@ -2,15 +2,21 @@
 
 import os
 from dotenv import load_dotenv
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
 
-def get_db_url():
-    """Get the database URL."""
-    return os.environ.get("DATABASE_URL")
+class Settings(BaseSettings):
+    """Settings class"""
+
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    allow_origins: str
+    database_user: str
+    database_password: str
+    database_name: str
+    database_host: str
+    database_port: str
 
 
-def get_origins():
-    """Get the origins."""
-    return os.environ.get("ORIGIN_URLS", "*").split(",")
+settings = Settings()
