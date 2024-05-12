@@ -12,9 +12,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from .database import Base, engine
 
 playlist_feature_id_seq = Sequence("playlist_feature_id_seq", start=330)
+playlist_feature_id_seq.create(engine, checkfirst=True)
 
 
 class User(Base):
