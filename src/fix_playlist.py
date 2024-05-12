@@ -262,7 +262,7 @@ def build_playlist(
     return playlist
 
 
-def analyse_and_fix_playlist(training_data, playlist_data):
+def analyse_and_fix_playlist(training_data, playlist_data, model_weights, retune):
     """Analyse and fix the playlist."""
 
     _training_data = [
@@ -281,22 +281,45 @@ def analyse_and_fix_playlist(training_data, playlist_data):
 
     # Check if the playlist_data_df spotify_playlist_id is in the training data
     # if not, add it to the training data
-    if playlist_data_df.iloc[0]["spotify_playlist_id"] in training_data_df.index:
-        print("Playlist feature already exists, skipping training...")
+    if (
+        retune is True
+        or playlist_data_df.iloc[0]["spotify_playlist_id"] in training_data_df.index
+    ):
+        print("Will not train the model - Data already exists")
         playlist_data.must_train = False
 
     datapoint, features = process_data(playlist_data_df)
-    weights = np.array(
-        [
-            0.17324821444202046,
-            0.07176071971418228,
-            0.09139859881649352,
-            0.08270437843029588,
-            0.05826917930667714,
-            0.37975134149673134,
-            0.0652021402236166,
-            0.07766542756998279,
-        ]
+    _weights = (
+        schemas.ModelWeights.model_validate(model_weights).model_dump()
+        if model_weights
+        else None
+    )
+    weights = (
+        np.array(
+            [
+                _weights["energy"],
+                _weights["liveness"],
+                _weights["tempo"],
+                _weights["speechiness"],
+                _weights["acousticness"],
+                _weights["instrumentalness"],
+                _weights["danceability"],
+                _weights["loudness"],
+            ]
+        )
+        if _weights
+        else np.array(
+            [
+                0.17324821444202046,
+                0.07176071971418228,
+                0.09139859881649352,
+                0.08270437843029588,
+                0.05826917930667714,
+                0.37975134149673134,
+                0.0652021402236166,
+                0.07766542756998279,
+            ]
+        )
     )
     return_datapoint = False
     feature_importance = None
@@ -313,11 +336,13 @@ def analyse_and_fix_playlist(training_data, playlist_data):
         evaluation_score = evaluate_model(model, x_test, y_test)
         print("Current model evaluation score: ", evaluation_score)
         feature_importance = get_model_feature_importance(model, x_train)
-        weights = [
-            # pylint: disable=unsubscriptable-object
-            feature_importance["Importance"][feature]
-            for feature in x_train.columns
-        ]
+        weights = np.array(
+            [
+                # pylint: disable=unsubscriptable-object
+                feature_importance["Importance"][feature]
+                for feature in x_train.columns
+            ]
+        )
         print("Done training the model...")
 
     matrix_features = features.drop(columns=["valence"])

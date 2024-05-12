@@ -1,9 +1,20 @@
 """Database models."""
 
-from sqlalchemy import Column, ForeignKey, Integer, String, TIMESTAMP, text, Numeric
+from sqlalchemy import (
+    Column,
+    ForeignKey,
+    Integer,
+    String,
+    TIMESTAMP,
+    text,
+    Numeric,
+    Sequence,
+)
 from sqlalchemy.orm import relationship
 
 from .database import Base
+
+playlist_feature_id_seq = Sequence("playlist_feature_id_seq", start=330)
 
 
 class User(Base):
@@ -47,7 +58,13 @@ class PlaylistFeature(Base):
 
     __tablename__ = "playlists_features"
 
-    id = Column(Integer, primary_key=True, index=True, nullable=False)
+    id = Column(
+        Integer,
+        playlist_feature_id_seq,
+        primary_key=True,
+        index=True,
+        nullable=False,
+    )
     spotify_playlist_id = Column(String, unique=True, nullable=False, index=True)
     energy = Column(Numeric, nullable=False)
     liveness = Column(Numeric, nullable=False)

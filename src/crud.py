@@ -72,3 +72,8 @@ def create_model_weights(db: Session, weights: schemas.ModelWeightsCreate):
     db.commit()
     db.refresh(db_weights)
     return db_weights
+
+
+def get_latest_model_weights(db: Session):
+    """Get the latest model weights."""
+    return db.query(models.ModelWeights).order_by(models.ModelWeights.id.desc()).first()

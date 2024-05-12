@@ -11,8 +11,7 @@ from .. import fix_playlist
 router = APIRouter(prefix="/api/v1/tuner", tags=["Playlist Tuner"])
 
 
-#  response_model=schemas.TunedPlaylist
-@router.post("/tune_playlist")
+@router.post("/tune_playlist", response_model=schemas.TunedPlaylist)
 def tune_playlist(data: schemas.TunePlaylist, db: Session = Depends(get_db)):
     """Tune the Playlist"""
     try:
@@ -20,8 +19,15 @@ def tune_playlist(data: schemas.TunePlaylist, db: Session = Depends(get_db)):
             feature for feature in data.tracks_features if feature is not None
         ]
         training_data = crud.get_all_playlist_features(db)
+        model_weights = crud.get_latest_model_weights(db)
+        playlist = crud.get_playlists_by_spotify_ids(
+            db, [data.spotify_playlist_id]
+        ).first()
+
         track_uris, datapoint, weights, evaluation_score = (
-            fix_playlist.analyse_and_fix_playlist(training_data, data)
+            fix_playlist.analyse_and_fix_playlist(
+                training_data, data, model_weights, True if playlist else False
+            )
         )
         if isinstance(datapoint, pd.DataFrame):
             crud.create_playlist_feature_datapoint(
