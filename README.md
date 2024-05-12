@@ -38,7 +38,7 @@ Start the server
 
 ## Tech Stack
 
-**Server:** Python, FastAPI, Supabase
+Python, FastAPI, Supabase
 
 ## Authors
 
